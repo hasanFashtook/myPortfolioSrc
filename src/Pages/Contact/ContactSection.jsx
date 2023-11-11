@@ -2,9 +2,11 @@ import { EnvelopeIcon, MapPinIcon, PhoneIcon } from '@heroicons/react/24/outline
 import PropTypes from 'prop-types'
 import Button from '../../Components/Button'
 import InputFeild from '../../Components/InputFeild'
-import { useState } from 'react'
-
+import { useId, useState } from 'react'
+import { db } from '../../firebase'
+import { collection, addDoc } from 'firebase/firestore'
 function ContactSection({ className }) {
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -13,15 +15,33 @@ function ContactSection({ className }) {
     content: ''
   })
 
+  const idTextArea = useId();
 
   function handleChange(e) {
     e.preventDefault();
     setFormData({ ...formData, [e.target.name]: e.target.value });
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+
+    try {
+      await addDoc(collection(db, 'emails'), formData);
+      alert('message has been sent')
+    } catch (err) {
+      alert(err)
+    }
+    finally {
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        phone: '',
+        content: ''
+      })
+    }
   }
+
   return (
     <div className={'ContactSection ' + className} >
       <div className="container-b my-24 flex gap-6 justify-between max-md:flex-col">
@@ -98,11 +118,28 @@ function ContactSection({ className }) {
               onChange={(e) => { handleChange(e) }}
             />
           </div>
-          <textarea
-            value={formData.content}
-            name='content'
-            onChange={(e) => handleChange(e)}
-            className=' p-5 bg-slate-50 rounded-2xl resize-none h-36 focus:bg-white transition-all duration-300 outline-[#7d11f9]' />
+          <div className='relative mt-6'>
+            <textarea
+              value={formData.content}
+              name='content'
+              id={idTextArea}
+              onChange={(e) => handleChange(e)}
+              className={`peer w-full h-14 rounded-lg border-b py-2 px-[0.625rem] focus:outline 
+              focus:outline-2 focus:outline-[#7d11f9] placeholder:text-transparent 
+              bg-slate-50 focus:bg-white resize-none
+              ${formData.content && ' bg-white'}`}
+            />
+            <label
+              htmlFor={idTextArea}
+              className={`absolute capitalize left-0 ml-1 p-1 bg-inherit 
+              peer-focus:-translate-y-4 ease-linear text-gray-500 
+              peer-placeholder-shown:translate-y-1/2 peer-focus:px-1 
+              peer-focus:bg-white peer-focus:ml-1 duration-100
+          ${formData.content && ' -translate-y-4 bg-white'}`}
+            >
+              your message
+            </label>
+          </div>
           <Button contained className={' self-end max-sm:self-stretch justify-center'}>send message</Button>
         </form>
       </div>
@@ -115,3 +152,7 @@ ContactSection.propTypes = {
 }
 
 export default ContactSection
+// 3000 haseeb
+// 9000 martadela
+// 8000 sugar
+// 3000 fakhara
