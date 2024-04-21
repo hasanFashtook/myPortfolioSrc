@@ -152,7 +152,3 @@ ContactSection.propTypes = {
 }
 
 export default ContactSection
-// 3000 haseeb
-// 9000 martadela
-// 8000 sugar
-// 3000 fakhara

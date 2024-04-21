@@ -5,10 +5,11 @@ import TagBraket from '../../Components/Icons/TagBraket';
 import Button from '../../Components/Button';
 import { useObserver } from '../../Hooks/useObserver';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import Loading from '../../Components/Loading';
+import { Client } from "get-pinned-repos";
 
 function Gallery({ className }) {
+  Client.setToken(import.meta.env.VITE_GITHUB_TOKEN);
   const [isShowing, eleRef] = useObserver();
   const [repos, setRepos] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -17,12 +18,11 @@ function Gallery({ className }) {
     (async function getRepos() {
       try {
         setLoading(true)
-        const data = await axios.get(`https://api.github.com/users/hasanFashtook/repos`)
-
+        const pinned = await Client.getPinnedRepos("hasanFashtook");
         // We will only show six projects,
         // And change the object's keys to accordance with the component,
         // Using object destructring.
-        const customArr = data.data.slice(0, 6).map((item) => {
+        const customArr = pinned.slice(0, 6).map((item) => {
           const { icon = <TagBraket />, name: title, description: content, html_url: path } = item;
           return { icon, title, content, path }
         });
